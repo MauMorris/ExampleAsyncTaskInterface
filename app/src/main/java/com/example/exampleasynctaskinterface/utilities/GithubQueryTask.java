@@ -27,8 +27,16 @@ public class GithubQueryTask extends AsyncTask<URL, Void, String> {
     }
 
     @Override
+    protected void onPreExecute() {
+        super.onPreExecute();
+        myInterface.myResultPreExecute();
+    }
+
+    @Override
     protected void onPostExecute(String s) {
         if (s != null && !s.equals(""))
-            myInterface.myResult(s);
+            myInterface.myResultPostExecute(s);
+        else
+            myInterface.myResultPostExecute("");
     }
 }

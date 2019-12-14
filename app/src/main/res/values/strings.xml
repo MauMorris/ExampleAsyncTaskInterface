@@ -1,9 +1,12 @@
 <resources>
     <string name="app_name">ExampleAsyncTaskInterface</string>
+
     <string name="action_settings">Settings</string>
 
-    <string name="search">Search</string>
-    <string name="makeSearch">Make a search!</string>
-    <string name="urlDisplay">Click search and your URL will show up here!</string>
-    <string name="hintSearchbox">Enter a query, then click Search</string>
+    <string name="search">Búsqueda</string>
+    <string name="makeSearch">Realiza una consulta!</string>
+    <string name="urlDisplay">Da clic en "Búsqueda" y tu URL se mostrará aquí!</string>
+    <string name="hintSearchbox">Ingresa un query, después da clic en "Búsqueda"</string>
+    <string name="error_message">Error en la consulta, por favor intentalo nuevamente</string>
+
 </resources>
