@@ -6,12 +6,12 @@ import android.os.Bundle;
 import com.example.exampleasynctaskinterface.utilities.GithubQueryTask;
 import com.example.exampleasynctaskinterface.utilities.NetworkUtils;
 import com.example.exampleasynctaskinterface.utilities.TaskInterface;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.Menu;
@@ -23,8 +23,13 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import java.net.URL;
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity implements TaskInterface {
+
+    public static final String SEARCH_QUERY_EXTRA = "query";
+    public static final int SEARCH_QUERY_EXTRA_URL = 0;
+    public static final int SEARCH_QUERY_EXTRA_RESULT = 1;
 
     //campos para ingresar el param de busqueda, mostrar la URL y la respuesta del request
     private EditText mSearchBoxEditText;
@@ -58,6 +63,32 @@ public class MainActivity extends AppCompatActivity implements TaskInterface {
                 return false;
             }
         });
+
+        if(savedInstanceState != null) {
+            if (savedInstanceState.containsKey(SEARCH_QUERY_EXTRA)) {
+                ArrayList <String> queryUrl = savedInstanceState.getStringArrayList(SEARCH_QUERY_EXTRA);
+                if (queryUrl != null) {
+                    if(!queryUrl.isEmpty()){
+                        mUrlDisplayTextView.setText(queryUrl.get(SEARCH_QUERY_EXTRA_URL));
+                        mSearchResultsTextView.setText(queryUrl.get(SEARCH_QUERY_EXTRA_RESULT));
+                    }
+                }
+            }
+        }
+    }
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        String queryUrl = mUrlDisplayTextView.getText().toString();
+        String resultQuery = mSearchResultsTextView.getText().toString();
+
+        ArrayList <String> savedData = new ArrayList<>();
+        savedData.add(SEARCH_QUERY_EXTRA_URL, queryUrl);
+        savedData.add(SEARCH_QUERY_EXTRA_RESULT, resultQuery);
+
+        outState.putStringArrayList(SEARCH_QUERY_EXTRA, savedData);
     }
 
     @Override
@@ -90,7 +121,7 @@ public class MainActivity extends AppCompatActivity implements TaskInterface {
     public void myResultPostExecute(String result) {
         mLoadingIndicator.setVisibility(View.INVISIBLE);
 
-        if(result != null && !result.equals("")){
+        if(result != null && !TextUtils.isEmpty(result)){
             mSearchResultsTextView.setText(result);
             showJsonDataView();
         } else {
@@ -112,6 +143,11 @@ public class MainActivity extends AppCompatActivity implements TaskInterface {
      */
     private void makeGithubSearchQuery() {
         String githubQuery = mSearchBoxEditText.getText().toString();
+
+        if(TextUtils.isEmpty(githubQuery)){
+            mUrlDisplayTextView.setText(getString(R.string.error_no_query));
+            return;
+        }
         URL githubSearchUrl = NetworkUtils.buildUrl(githubQuery);
 
         mUrlDisplayTextView.setText(githubSearchUrl.toString());

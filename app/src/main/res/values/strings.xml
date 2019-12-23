@@ -8,5 +8,5 @@
     <string name="urlDisplay">Da clic en "Búsqueda" y tu URL se mostrará aquí!</string>
     <string name="hintSearchbox">Ingresa un query, después da clic en "Búsqueda"</string>
     <string name="error_message">Error en la consulta, por favor intentalo nuevamente</string>
-
+    <string name="error_no_query">Ingresa un query, después da clic en "Búsqueda"</string>
 </resources>
