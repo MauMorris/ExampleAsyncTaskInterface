@@ -1,6 +1,9 @@
-package com.example.exampleasynctaskinterface.utilities;
+package com.example.exampleasynctaskinterface.datasource;
 
 import android.os.AsyncTask;
+
+import com.example.exampleasynctaskinterface.datasource.utilities.NetworkUtils;
+import com.example.exampleasynctaskinterface.repository.TaskInterface;
 
 import java.io.IOException;
 import java.net.URL;
@@ -27,16 +30,10 @@ public class GithubQueryTask extends AsyncTask<URL, Void, String> {
     }
 
     @Override
-    protected void onPreExecute() {
-        super.onPreExecute();
-        myInterface.myResultPreExecute();
-    }
-
-    @Override
     protected void onPostExecute(String s) {
         if (s != null && !s.equals(""))
-            myInterface.myResultPostExecute(s);
+            myInterface.sucessResultPostExecute(s);
         else
-            myInterface.myResultPostExecute("");
+            myInterface.errorResultPostExecute("");
     }
 }

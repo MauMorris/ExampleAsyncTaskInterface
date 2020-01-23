@@ -1,4 +1,4 @@
-package com.example.exampleasynctaskinterface.utilities;
+package com.example.exampleasynctaskinterface.datasource.utilities;
 
 import android.net.Uri;
 
