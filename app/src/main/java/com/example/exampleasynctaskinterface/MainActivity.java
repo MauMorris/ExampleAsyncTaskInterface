@@ -3,6 +3,7 @@ package com.example.exampleasynctaskinterface;
 import android.content.Context;
 import android.os.Bundle;
 
+import com.example.exampleasynctaskinterface.databinding.ActivityMainBinding;
 import com.example.exampleasynctaskinterface.utilities.GithubQueryTask;
 import com.example.exampleasynctaskinterface.utilities.NetworkUtils;
 import com.example.exampleasynctaskinterface.utilities.TaskInterface;
@@ -10,6 +11,7 @@ import com.example.exampleasynctaskinterface.utilities.TaskInterface;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.databinding.DataBindingUtil;
 
 import android.text.TextUtils;
 import android.view.KeyEvent;
@@ -18,8 +20,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.EditText;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import java.net.URL;
@@ -32,12 +32,7 @@ public class MainActivity extends AppCompatActivity implements TaskInterface {
     public static final int SEARCH_QUERY_EXTRA_RESULT = 1;
 
     //campos para ingresar el param de busqueda, mostrar la URL y la respuesta del request
-    private EditText mSearchBoxEditText;
-    private TextView mUrlDisplayTextView;
-
-    private TextView mSearchResultsTextView;
-    private TextView mErrorMessageTextView;
-    private ProgressBar mLoadingIndicator;
+    private ActivityMainBinding mDataBinding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,14 +41,9 @@ public class MainActivity extends AppCompatActivity implements TaskInterface {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        mSearchBoxEditText = findViewById(R.id.et_search_box);
-        mUrlDisplayTextView = findViewById(R.id.tv_url_display);
+        mDataBinding = DataBindingUtil.setContentView(this, R.layout.activity_main);
 
-        mSearchResultsTextView = findViewById(R.id.tv_github_search_results_json);
-        mErrorMessageTextView = findViewById(R.id.tv_error_message_display);
-        mLoadingIndicator = findViewById(R.id.pb_loading_indicator);
-
-        mSearchBoxEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+        mDataBinding.secondaryLayout.searchBoxEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_SEND) {
@@ -69,8 +59,8 @@ public class MainActivity extends AppCompatActivity implements TaskInterface {
                 ArrayList <String> queryUrl = savedInstanceState.getStringArrayList(SEARCH_QUERY_EXTRA);
                 if (queryUrl != null) {
                     if(!queryUrl.isEmpty()){
-                        mUrlDisplayTextView.setText(queryUrl.get(SEARCH_QUERY_EXTRA_URL));
-                        mSearchResultsTextView.setText(queryUrl.get(SEARCH_QUERY_EXTRA_RESULT));
+                        mDataBinding.secondaryLayout.urlDisplayTextView.setText(queryUrl.get(SEARCH_QUERY_EXTRA_URL));
+                        mDataBinding.secondaryLayout.githubSearchResultsJsonTextView.setText(queryUrl.get(SEARCH_QUERY_EXTRA_RESULT));
                     }
                 }
             }
@@ -81,8 +71,8 @@ public class MainActivity extends AppCompatActivity implements TaskInterface {
     protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
 
-        String queryUrl = mUrlDisplayTextView.getText().toString();
-        String resultQuery = mSearchResultsTextView.getText().toString();
+        String queryUrl = mDataBinding.secondaryLayout.urlDisplayTextView.getText().toString();
+        String resultQuery = mDataBinding.secondaryLayout.githubSearchResultsJsonTextView.getText().toString();
 
         ArrayList <String> savedData = new ArrayList<>();
         savedData.add(SEARCH_QUERY_EXTRA_URL, queryUrl);
@@ -119,10 +109,10 @@ public class MainActivity extends AppCompatActivity implements TaskInterface {
      */
     @Override
     public void myResultPostExecute(String result) {
-        mLoadingIndicator.setVisibility(View.INVISIBLE);
+        mDataBinding.secondaryLayout.loadingIndicatorProgressBar.setVisibility(View.INVISIBLE);
 
         if(result != null && !TextUtils.isEmpty(result)){
-            mSearchResultsTextView.setText(result);
+            mDataBinding.secondaryLayout.githubSearchResultsJsonTextView.setText(result);
             showJsonDataView();
         } else {
             showErrorMessage();
@@ -131,7 +121,7 @@ public class MainActivity extends AppCompatActivity implements TaskInterface {
 
     @Override
     public void myResultPreExecute() {
-        mLoadingIndicator.setVisibility(View.VISIBLE);
+        mDataBinding.secondaryLayout.loadingIndicatorProgressBar.setVisibility(View.VISIBLE);
         showNoView();
     }
 
@@ -142,15 +132,15 @@ public class MainActivity extends AppCompatActivity implements TaskInterface {
      * our (not yet created) {@link GithubQueryTask}
      */
     private void makeGithubSearchQuery() {
-        String githubQuery = mSearchBoxEditText.getText().toString();
+        String githubQuery = mDataBinding.secondaryLayout.githubSearchResultsJsonTextView.getText().toString();
 
         if(TextUtils.isEmpty(githubQuery)){
-            mUrlDisplayTextView.setText(getString(R.string.error_no_query));
+            mDataBinding.secondaryLayout.urlDisplayTextView.setText(getString(R.string.error_no_query));
             return;
         }
         URL githubSearchUrl = NetworkUtils.buildUrl(githubQuery);
 
-        mUrlDisplayTextView.setText(githubSearchUrl.toString());
+        mDataBinding.secondaryLayout.urlDisplayTextView.setText(githubSearchUrl.toString());
 
         GithubQueryTask mTask = new GithubQueryTask(this);
         mTask.execute(githubSearchUrl);
@@ -161,24 +151,24 @@ public class MainActivity extends AppCompatActivity implements TaskInterface {
      * makes visible the results from query and hides error message
      */
     private void showJsonDataView() {
-        mErrorMessageTextView.setVisibility(View.INVISIBLE);
-        mSearchResultsTextView.setVisibility(View.VISIBLE);
+        mDataBinding.secondaryLayout.errorMessageDisplayTextView.setVisibility(View.INVISIBLE);
+        mDataBinding.secondaryLayout.githubSearchResultsJsonTextView.setVisibility(View.VISIBLE);
     }
 
     /**
      * makes visible error message and hides query result
      */
     private void showErrorMessage() {
-        mErrorMessageTextView.setVisibility(View.VISIBLE);
-        mSearchResultsTextView.setVisibility(View.INVISIBLE);
+        mDataBinding.secondaryLayout.errorMessageDisplayTextView.setVisibility(View.VISIBLE);
+        mDataBinding.secondaryLayout.githubSearchResultsJsonTextView.setVisibility(View.INVISIBLE);
     }
 
     /**
      * hides everything for the user and only shows the activity indicator
      */
     private void showNoView() {
-        mErrorMessageTextView.setVisibility(View.INVISIBLE);
-        mSearchResultsTextView.setVisibility(View.INVISIBLE);
+        mDataBinding.secondaryLayout.errorMessageDisplayTextView.setVisibility(View.INVISIBLE);
+        mDataBinding.secondaryLayout.githubSearchResultsJsonTextView.setVisibility(View.INVISIBLE);
     }
 
     /**
