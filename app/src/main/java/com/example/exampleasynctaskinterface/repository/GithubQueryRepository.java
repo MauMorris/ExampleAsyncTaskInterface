@@ -29,7 +29,7 @@ public class GithubQueryRepository implements RepositoryCallback {
 
             @Override
             public void errorResultPostExecute(String error) {
-
+                returnDataFromTask.returnData(error);
             }
         });
         mTask.execute(url);
